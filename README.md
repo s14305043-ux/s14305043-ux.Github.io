@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基本電學：交流電功率教學與計算工具</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 圖標庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- MathJax 數學公式渲染 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .tab-active {
+            border-bottom-width: 4px;
+            border-color: #3b82f6;
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header 頂部導航 -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0 text-center md:text-left">
+                <span class="bg-blue-500 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full text-white">基本電學單元</span>
+                <h1 class="text-3xl md:text-4xl font-extrabold mt-2 tracking-tight">交流電功率 (AC Power)</h1>
+                <p class="text-blue-100 mt-1 text-sm md:text-base">深入淺出解析：瞬間功率、實功率、虛功率、視在功率與功率因數</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="#calculator" class="bg-white text-blue-800 font-bold px-4 py-2 rounded-lg shadow hover:bg-blue-50 transition duration-150 text-sm flex items-center">
+                    <i class="fa-solid fa-calculator mr-2"></i>功率計算器
+                </a>
+                <a href="#quiz" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-lg shadow hover:bg-indigo-500 transition duration-150 text-sm flex items-center border border-indigo-500">
+                    <i class="fa-solid fa-graduation-cap mr-2"></i>隨堂測驗
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8">
+        
+        <!-- 分頁切換 Tab -->
+        <div class="flex border-b border-slate-200 mb-8 overflow-x-auto whitespace-nowrap bg-white rounded-lg shadow-sm p-2">
+            <button onclick="switchTab('all')" id="tab-all" class="px-5 py-3 text-sm md:text-base font-medium text-slate-600 hover:text-blue-600 focus:outline-none tab-active transition-all">
+                <i class="fa-solid fa-book-open mr-2"></i>完整教學
+            </button>
+            <button onclick="switchTab('theory')" id="tab-theory" class="px-5 py-3 text-sm md:text-base font-medium text-slate-600 hover:text-blue-600 focus:outline-none transition-all">
+                <i class="fa-solid fa-square-root-variable mr-2"></i>三大功率與公式
+            </button>
+            <button onclick="switchTab('triangle')" id="tab-triangle" class="px-5 py-3 text-sm md:text-base font-medium text-slate-600 hover:text-blue-600 focus:outline-none transition-all">
+                <i class="fa-solid fa-play-css mr-2"></i>功率三角形與因數
+            </button>
+            <button onclick="switchTab('tool')" id="tab-tool" class="px-5 py-3 text-sm md:text-base font-medium text-slate-600 hover:text-blue-600 focus:outline-none transition-all">
+                <i class="fa-solid fa-square-poll-horizontal mr-2"></i>互動計算器
+            </button>
+        </div>
+
+        <!-- Section: Theory Content 觀念教學 -->
+        <div id="section-theory" class="space-y-8">
+            
+            <!-- 三大功率資訊看板 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
+                    <div>
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center mb-4 text-xl font-bold">P</div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">平均功率 (Average Power)</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed mb-4">又稱「實功率」或「有功功率」。這是電路中真正消耗、轉換為熱能、機械能或光能的實際功率。</p>
+                    </div>
+                    <div class="border-t pt-3 flex justify-between items-center">
+                        <span class="text-xs text-slate-400">單位：瓦特 (Watt)</span>
+                        <span class="font-bold text-emerald-600 text-lg">$W$</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
+                    <div>
+                        <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center mb-4 text-xl font-bold">Q</div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">虛功率 (Reactive Power)</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed mb-4">又稱「無功功率」。電感或電容元件與電源之間進行電能與磁場（或電場）能量交換的速率。</p>
+                    </div>
+                    <div class="border-t pt-3 flex justify-between items-center">
+                        <span class="text-xs text-slate-400">單位：乏爾 (Volt-Ampere Reactive)</span>
+                        <span class="font-bold text-amber-600 text-lg">$var$</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
+                    <div>
+                        <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center mb-4 text-xl font-bold">S</div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">視在功率 (Apparent Power)</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed mb-4">交流電路中電壓有效值與電流有效值的乘積，代表電源所必須提供的總容量。</p>
+                    </div>
+                    <div class="border-t pt-3 flex justify-between items-center">
+                        <span class="text-xs text-slate-400">單位：伏安 (Volt-Ampere)</span>
+                        <span class="font-bold text-blue-600 text-lg">$VA$</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 交流電與直流電深度解析 -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                    <span class="w-2 h-8 bg-blue-600 rounded-full mr-3"></span>
+                    1. 什麼是交流電功率？與直流電有何不同？
+                </h2>
+                <div class="prose max-w-none text-slate-600 space-y-4">
+                    <p>
+                        在直流電路（DC）中，功率的計算非常單純，即 $P = V \times I$。因為直流電的電壓與電流方向及大小不隨時間改變。
+                    </p>
+                    <p>
+                        然而在<strong>交流電路（AC）</strong>中，電壓與電流皆隨時間呈正弦波變化。若電路中含有<strong>電感（L）</strong>或<strong>電容（C）</strong>元件，會導致電壓與電流的相位不一致（產生相位角差 $\theta$），這使得功率的計算變得複雜。
+                    </p>
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg my-4">
+                        <h4 class="font-bold text-amber-800 mb-1">關鍵概念：相位差 $\theta$</h4>
+                        <p class="text-sm text-amber-700">
+                            $\theta = \theta_v - \theta_i$（電壓相位角減去電流相位角）。<br>
+                            - 若電路呈<strong>純電阻性</strong>，電壓與電流同相，$\theta = 0^\circ$。<br>
+                            - 若電路呈<strong>電感性</strong>（如馬達、變壓器），電流落後電壓，$\theta > 0^\circ$。<br>
+                            - 若電路呈<strong>電容性</strong>，電流超前電壓，$\theta < 0^\circ$。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 公式詳細解析 -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                    <span class="w-2 h-8 bg-blue-600 rounded-full mr-3"></span>
+                    2. 核心公式解析
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Formulas list -->
+                    <div class="space-y-6">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-blue-950 mb-2">瞬間功率 $p(t)$</h4>
+                            <p class="text-sm text-slate-600 mb-2">電壓與電流在任意瞬間的乘積：</p>
+                            <div class="bg-white p-3 rounded border text-center font-mono text-base">
+                                $p(t) = v(t) \cdot i(t) = V_m I_m \sin(\omega t) \sin(\omega t - \theta)$
+                                <div class="text-xs text-blue-600 mt-1">展開後含有一個恆定直流項與一個兩倍角頻率交流項</div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-emerald-950 mb-2">實功率 $P$ (平均功率)</h4>
+                            <p class="text-sm text-slate-600 mb-2">真正消耗在電阻上的功率：</p>
+                            <div class="bg-white p-3 rounded border text-center font-mono text-base">
+                                $P = V I \cos\theta = I^2 R = \frac{V_R^2}{R}$
+                                <div class="text-xs text-emerald-600 mt-1">（$V, I$ 為有效值，$\cos\theta$ 為功率因數）</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-amber-950 mb-2">虛功率 $Q$</h4>
+                            <p class="text-sm text-slate-600 mb-2">在電感/電容與電源間往返，不消耗能量的功率：</p>
+                            <div class="bg-white p-3 rounded border text-center font-mono text-base">
+                                $Q = V I \sin\theta = I^2 X = \frac{V_X^2}{X}$
+                                <div class="text-xs text-amber-600 mt-1">電感性電路 $Q_L > 0$（吸虛功），電容性電路 $Q_C < 0$（發虛功）</div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-indigo-950 mb-2">視在功率 $S$</h4>
+                            <p class="text-sm text-slate-600 mb-2">電源實際需要承載與提供的總容量：</p>
+                            <div class="bg-white p-3 rounded border text-center font-mono text-base">
+                                $S = V I = I^2 Z = \sqrt{P^2 + Q^2}$
+                                <div class="text-xs text-indigo-600 mt-1">複數形式表示為：$\mathbf{S} = P + jQ$</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Section: Triangle and Power Factor 功率三角形 -->
+        <div id="section-triangle" class="space-y-8 my-8">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                    <span class="w-2 h-8 bg-blue-600 rounded-full mr-3"></span>
+                    3. 功率三角形 (Power Triangle) 與功率因數
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <!-- SVG Visualizer -->
+                    <div class="bg-slate-900 p-6 rounded-xl flex flex-col items-center justify-center text-white shadow-inner">
+                        <span class="text-xs text-slate-400 mb-2 self-start"><i class="fa-solid fa-circle-info mr-1"></i>功率三角形圖示（電感性負載 $\theta > 0$）</span>
+                        
+                        <!-- Responsive SVG Container -->
+                        <svg viewBox="0 0 300 240" class="w-full max-w-[280px] h-auto">
+                            <!-- Horizontal Axis (P) -->
+                            <line x1="40" y1="200" x2="240" y2="200" stroke="#10b981" stroke-width="3" marker-end="url(#arrow-green)" />
+                            <!-- Vertical Axis (Q) -->
+                            <line x1="240" y1="200" x2="240" y2="50" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrow-amber)" />
+                            <!-- Hypotenuse (S) -->
+                            <line x1="40" y1="200" x2="240" y2="50" stroke="#3b82f6" stroke-width="3" marker-end="url(#arrow-blue)" />
+                            
+                            <!-- Angle arc -->
+                            <path d="M 80 200 A 40 40 0 0 0 75 173" fill="none" stroke="#e2e8f0" stroke-width="2" />
+                            
+                            <!-- Labels -->
+                            <text x="140" y="220" fill="#10b981" font-weight="bold" font-size="14">實功率 P (W)</text>
+                            <text x="250" y="125" fill="#f59e0b" font-weight="bold" font-size="14">虛功率 Q (var)</text>
+                            <text x="100" y="110" fill="#3b82f6" font-weight="bold" font-size="14" transform="rotate(-37, 100, 110)">視在功率 S (VA)</text>
+                            <text x="90" y="190" fill="#e2e8f0" font-size="14">θ</text>
+                            
+                            <!-- Right angle marker -->
+                            <path d="M 230 200 L 230 190 L 240 190" fill="none" stroke="#e2e8f0" stroke-width="1.5" />
+                            
+                            <!-- Markers Definitions -->
+                            <defs>
+                                <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                    <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+                                </marker>
+                                <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                    <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b" />
+                                </marker>
+                                <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                    <path d="M 0 1 L 10 5 L 0 9 z" fill="#3b82f6" />
+                                </marker>
+                            </defs>
+                        </svg>
+
+                        <div class="mt-4 text-xs text-slate-300 bg-slate-800 p-3 rounded-lg w-full">
+                            <strong>畢氏定理關係：</strong><br>
+                            $S^2 = P^2 + Q^2 \implies S = \sqrt{P^2 + Q^2}$
+                        </div>
+                    </div>
+
+                    <!-- Theory details of PF -->
+                    <div class="space-y-4 text-slate-600">
+                        <h3 class="text-xl font-bold text-slate-800">功率因數 (Power Factor, PF)</h3>
+                        <p>
+                            功率因數定義為<strong>實功率 $P$ 與視在功率 $S$ 的比值</strong>，數值介於 $0$ 與 $1$ 之間：
+                        </p>
+                        <div class="bg-slate-50 p-3 rounded-lg border font-mono text-center text-lg text-slate-800">
+                            $PF = \cos\theta = \frac{P}{S}$
+                        </div>
+                        <p>
+                            功率因數代表<strong>「電源容量能被有效利用的比例」</strong>。
+                        </p>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong class="text-slate-800">高功率因數 ($PF \approx 1$)：</strong> 電路接近純電阻，大部分電能被轉化為實功，傳輸效率極佳。</li>
+                            <li><strong class="text-slate-800">低功率因數 ($PF < 0.8$)：</strong> 虛功比重高，電網中會流過較大的無功電流，造成線路損失（$I^2 R_{line}$）增加。</li>
+                        </ul>
+                        
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                            <h4 class="font-bold text-blue-800 mb-1">改善功率因數（功因補償）</h4>
+                            <p class="text-sm text-blue-700">
+                                工廠或大樓多數為<strong>電感性負載</strong>（如馬達、日光燈安定器），此時 $Q > 0$。為了提升功率因數，一般會在電路上<strong>並聯電容器</strong>（提供負的虛功 $Q_C$）來抵消電感帶來的虛功，藉此減少視在功率 $S$，降低線路流過的總電流，達到節省線損與線路載流量的目的。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Interactive Calculator 互動計算器 -->
+        <div id="section-tool" class="bg-white p-8 rounded-2xl shadow-md border border-slate-100 my-8">
+            <h2 id="calculator" class="text-2xl font-bold text-slate-800 mb-2 flex items-center">
+                <span class="w-2 h-8 bg-blue-600 rounded-full mr-3"></span>
+                4. 互動式交流電功率計算器
+            </h2>
+            <p class="text-slate-500 mb-6 text-sm">請輸入電壓、電流或阻抗參數，系統將自動計算各類功率，並動態繪製對應的功率三角形！</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Left Side: Inputs -->
+                <div class="lg:col-span-5 bg-slate-50 p-6 rounded-xl border border-slate-200/60 space-y-5">
+                    <h3 class="font-bold text-slate-700 text-lg border-b pb-2"><i class="fa-solid fa-sliders mr-2 text-blue-600"></i>輸入電學參數</h3>
+                    
+                    <!-- Input Type Selector -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">輸入模式</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setCalcMode('vi')" id="btn-mode-vi" class="py-2 text-xs font-bold rounded-lg bg-blue-600 text-white shadow-sm transition">
+                                電壓 & 電流有效值
+                            </button>
+                            <button onclick="setCalcMode('zr')" id="btn-mode-zr" class="py-2 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 transition">
+                                阻抗 & 電阻 (Z-R)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Form Inputs (V-I Mode) -->
+                    <div id="inputs-vi" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 flex justify-between">
+                                <span>電壓有效值 $V$</span>
+                                <span id="val-v" class="font-mono text-blue-600 font-bold">110 V</span>
+                            </label>
+                            <input id="input-v" type="range" min="10" max="380" step="5" value="110" oninput="calculatePower()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 flex justify-between">
+                                <span>電流有效值 $I$</span>
+                                <span id="val-i" class="font-mono text-blue-600 font-bold">10 A</span>
+                            </label>
+                            <input id="input-i" type="range" min="0.5" max="50" step="0.5" value="10" oninput="calculatePower()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 flex justify-between">
+                                <span>電壓與電流相位差 $\theta$</span>
+                                <span id="val-theta" class="font-mono text-blue-600 font-bold">36.87 °</span>
+                            </label>
+                            <input id="input-theta" type="range" min="-90" max="90" step="0.5" value="36.87" oninput="calculatePower()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <div class="flex justify-between text-xs text-slate-400 mt-1">
+                                <span>-90° (純電容)</span>
+                                <span>0° (純電阻)</span>
+                                <span>+90° (純電感)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Inputs (Z-R Mode, Hidden by default) -->
+                    <div id="inputs-zr" class="space-y-4 hidden">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 flex justify-between">
+                                <span>電壓有效值 $V$</span>
+                                <span id="val-zr-v" class="font-mono text-blue-600 font-bold">110 V</span>
+                            </label>
+                            <input id="input-zr-v" type="range" min="10" max="380" step="5" value="110" oninput="calculatePower()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 flex justify-between">
+                                <span>電阻值 $R$</span>
+                                <span id="val-r" class="font-mono text-blue-600 font-bold">8 Ω</span>
+                            </label>
+                            <input id="input-r" type="range" min="1" max="100" step="1" value="8" oninput="calculatePower()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 flex justify-between">
+                                <span>電抗值 $X$ (+電感性 / -電容性)</span>
+                                <span id="val-x" class="font-mono text-blue-600 font-bold">6 Ω</span>
+                            </label>
+                            <input id="input-x" type="range" min="-100" max="100" step="1" value="6" oninput="calculatePower()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <div class="flex justify-between text-xs text-slate-400 mt-1">
+                                <span>-100Ω (電容)</span>
+                                <span>0Ω (純電阻)</span>
+                                <span>+100Ω (電感)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compensation capacitor toggle/feature -->
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input id="pf-compensate" type="checkbox" onchange="calculatePower()" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="text-xs font-bold text-blue-800">啟用功因改善模擬 (補償至 0.95 滯後)</span>
+                        </label>
+                        <p class="text-[11px] text-blue-600 mt-1 pl-7">當實際功率因數落後時，模擬並聯電容器將功因提升到理想狀態。</p>
+                    </div>
+                </div>
+
+                <!-- Right Side: Outputs & Visuals -->
+                <div class="lg:col-span-7 flex flex-col justify-between">
+                    <!-- Numbers output -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-center">
+                            <div class="text-[11px] font-bold text-indigo-500 uppercase">視在功率 S</div>
+                            <div id="out-s" class="text-lg md:text-xl font-extrabold text-indigo-800 font-mono mt-1">1100.0</div>
+                            <div class="text-[10px] text-indigo-400">VA (伏安)</div>
+                        </div>
+
+                        <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-center">
+                            <div class="text-[11px] font-bold text-emerald-500 uppercase">實功率 P</div>
+                            <div id="out-p" class="text-lg md:text-xl font-extrabold text-emerald-800 font-mono mt-1">880.0</div>
+                            <div class="text-[10px] text-emerald-400">W (瓦特)</div>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl text-center">
+                            <div class="text-[11px] font-bold text-amber-500 uppercase">虛功率 Q</div>
+                            <div id="out-q" class="text-lg md:text-xl font-extrabold text-amber-800 font-mono mt-1">660.0</div>
+                            <div class="text-[10px] text-amber-400">var (乏爾)</div>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center">
+                            <div class="text-[11px] font-bold text-slate-500 uppercase">功率因數 PF</div>
+                            <div id="out-pf" class="text-lg md:text-xl font-extrabold text-slate-800 font-mono mt-1">0.80</div>
+                            <div id="out-pf-desc" class="text-[10px] text-slate-500">滯後 (Laging)</div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive SVG -->
+                    <div class="bg-slate-950 p-6 rounded-xl shadow-inner border border-slate-800 flex flex-col items-center">
+                        <span class="text-xs text-slate-400 self-start mb-2"><i class="fa-solid fa-chart-line mr-1"></i>動態阻抗與功率向量響應：</span>
+                        
+                        <div class="w-full flex justify-center py-4 bg-slate-900 rounded border border-slate-800">
+                            <!-- Dynamic SVG -->
+                            <svg id="dyn-svg" viewBox="0 0 320 220" class="w-full max-w-[320px] h-auto">
+                                <!-- Grid Lines -->
+                                <line x1="20" y1="110" x2="300" y2="110" stroke="#334155" stroke-dasharray="2 2" stroke-width="1" />
+                                <line x1="60" y1="10" x2="60" y2="210" stroke="#334155" stroke-dasharray="2 2" stroke-width="1" />
+                                
+                                <!-- Static Coordinate labels -->
+                                <text x="295" y="125" fill="#475569" font-size="10">P</text>
+                                <text x="45" y="20" fill="#475569" font-size="10">+Q</text>
+                                <text x="45" y="205" fill="#475569" font-size="10">-Q</text>
+                                
+                                <!-- Reactive power vector -->
+                                <line id="svg-vec-q" x1="200" y1="110" x2="200" y2="50" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrow-amber)" />
+                                <!-- Real power vector -->
+                                <line id="svg-vec-p" x1="60" y1="110" x2="200" y2="110" stroke="#10b981" stroke-width="3" marker-end="url(#arrow-green)" />
+                                <!-- Apparent power vector -->
+                                <line id="svg-vec-s" x1="60" y1="110" x2="200" y2="50" stroke="#3b82f6" stroke-width="3" marker-end="url(#arrow-blue)" />
+                                
+                                <!-- Vector labels -->
+                                <text id="lbl-svg-p" x="120" y="130" fill="#10b981" font-size="10" font-weight="bold">P = 880 W</text>
+                                <text id="lbl-svg-q" x="210" y="80" fill="#f59e0b" font-size="10" font-weight="bold">Q = 660 var</text>
+                                <text id="lbl-svg-s" x="90" y="70" fill="#3b82f6" font-size="10" font-weight="bold">S = 1100 VA</text>
+
+                                <!-- Right angle box -->
+                                <path id="svg-right-angle" d="M 190 110 L 190 100 L 200 100" fill="none" stroke="#475569" stroke-width="1" />
+                            </svg>
+                        </div>
+                        
+                        <div id="comp-results" class="hidden mt-3 w-full text-xs bg-emerald-950/40 border border-emerald-800/50 p-3 rounded-lg text-emerald-300">
+                            <!-- Compensation results will dynamic load here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Interactive Quiz 隨堂自我檢測 -->
+        <div id="quiz" class="bg-white p-8 rounded-2xl shadow-md border border-slate-100 my-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center">
+                <span class="w-2 h-8 bg-indigo-600 rounded-full mr-3"></span>
+                5. 隨堂自我檢測
+            </h2>
+            <p class="text-slate-500 mb-6 text-sm">藉由模擬真實考試題目，快速檢驗學習成效！</p>
+
+            <div class="space-y-6">
+                <!-- Question 1 -->
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded">問題 1</span>
+                    <p class="text-base font-semibold text-slate-800 mt-2 mb-4">
+                        在交流電路中，已知某負載的電壓有效值為 $100\text{V}$，電流有效值為 $10\text{A}$，功率因數為 $0.8$ 滯後（Lagging）。請問該負載所消耗的「實功率」與「虛功率」分別為多少？
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button onclick="checkAnswer(1, 'A', this)" class="quiz-btn-1 p-3 text-left border rounded-lg hover:bg-slate-100 transition text-sm flex justify-between items-center bg-white">
+                            <span>A) $P = 1000\text{W}$, $Q = 800\text{var}$</span>
+                            <i class="fa-regular fa-circle text-slate-400"></i>
+                        </button>
+                        <button onclick="checkAnswer(1, 'B', this)" class="quiz-btn-1 p-3 text-left border rounded-lg hover:bg-slate-100 transition text-sm flex justify-between items-center bg-white">
+                            <span>B) $P = 800\text{W}$, $Q = 600\text{var}$</span>
+                            <i class="fa-regular fa-circle text-slate-400"></i>
+                        </button>
+                        <button onclick="checkAnswer(1, 'C', this)" class="quiz-btn-1 p-3 text-left border rounded-lg hover:bg-slate-100 transition text-sm flex justify-between items-center bg-white">
+                            <span>C) $P = 600\text{W}$, $Q = 800\text{var}$</span>
+                            <i class="fa-regular fa-circle text-slate-400"></i>
+                        </button>
+                        <button onclick="checkAnswer(1, 'D', this)" class="quiz-btn-1 p-3 text-left border rounded-lg hover:bg-slate-100 transition text-sm flex justify-between items-center bg-white">
+                            <span>D) $P = 800\text{W}$, $Q = 1000\text{var}$</span>
+                            <i class="fa-regular fa-circle text-slate-400"></i>
+                        </button>
+                    </div>
+                    <div id="explain-1" class="hidden mt-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-sm">
+                        <strong>解析：</strong><br>
+                        1. 視在功率 $S = V \times I = 100 \times 10 = 1000\text{ VA}$。<br>
+                        2. 功率因數 $PF = \cos\theta = 0.8$。所以實功率 $P = S \times \cos\theta = 1000 \times 0.8 = 800\text{ W}$。<br>
+                        3. 因為 $\cos\theta = 0.8$，可推得 $\sin\theta = 0.6$。所以虛功率 $Q = S \times \sin\theta = 1000 \times 0.6 = 600\text{ var}$。故答案為 <strong>B</strong>。
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded">問題 2</span>
+                    <p class="text-base font-semibold text-slate-800 mt-2 mb-4">
+                        並聯電容器改善功率因數的基本原理是什麼？
+                    </p>
+                    <div class="grid grid-cols-1 gap-3">
+                        <button onclick="checkAnswer(2, 'A', this)" class="quiz-btn-2 p-3 text-left border rounded-lg hover:bg-slate-100 transition text-sm flex justify-between items-center bg-white">
+                            <span>A) 電容器消耗多餘的實功率 (P)，降低總負荷。</span>
+                            <i class="fa-regular fa-circle text-slate-400"></i>
+                        </button>
+                        <button onclick="checkAnswer(2, 'B', this)" class="quiz-btn-2 p-3 text-left border rounded-lg hover:bg-slate-100 transition text-sm flex justify-between items-center bg-white">
+                            <span>B) 電容器具有超前的虛功率 ($-Q_C$)，能與電感負載的滯後虛功率 ($+Q_L$) 互相抵消。</span>
+                            <i class="fa-regular fa-circle text-slate-400"></i>
+                        </button>
+                        <button onclick="checkAnswer(2, 'C', this)" class="quiz-btn-2 p-3 text-left border rounded-lg hover:bg-slate-100 transition text-sm flex justify-between items-center bg-white">
+                            <span>C) 電容器會減少線路整體的電壓，進而降低電流。</span>
+                            <i class="fa-regular fa-circle text-slate-400"></i>
+                        </button>
+                    </div>
+                    <div id="explain-2" class="hidden mt-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-sm">
+                        <strong>解析：</strong><br>
+                        一般負載（如馬達）均為<strong>電感性負載</strong>，會吸收滯後的無功功率（虛功率 $+Q_L$）。此時並聯<strong>電容器</strong>，電容器能提供超前無功功率（即吸收 $-Q_C$ 虛功），從而在電網中與電感負載相互抵消，將虛功率需求限制在本地，進而提高整體電路的功率因數（PF）。故答案為 <strong>B</strong>。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer 頁腳 -->
+    <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 text-center space-y-3">
+            <p class="text-sm">交流電功率(AC Power) 互動式教材與計算工具 - 專為基本電學學習設計</p>
+            <p class="text-xs text-slate-500">本教材採用符合響應式設計、現代 UI 與無損向量繪製之技術</p>
+        </div>
+    </footer>
+
+    <!-- Script 控制與計算邏輯 -->
+    <script>
+        let currentMode = 'vi'; // 'vi' 模式 or 'zr' 模式
+
+        function switchTab(tab) {
+            // 重置所有 tab 樣式
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.classList.remove('tab-active');
+            });
+            
+            if (tab === 'all') {
+                document.getElementById('tab-all').classList.add('tab-active');
+                document.getElementById('section-theory').classList.remove('hidden');
+                document.getElementById('section-triangle').classList.remove('hidden');
+                document.getElementById('section-tool').classList.remove('hidden');
+            } else if (tab === 'theory') {
+                document.getElementById('tab-theory').classList.add('tab-active');
+                document.getElementById('section-theory').classList.remove('hidden');
+                document.getElementById('section-triangle').classList.add('hidden');
+                document.getElementById('section-tool').classList.add('hidden');
+            } else if (tab === 'triangle') {
+                document.getElementById('tab-triangle').classList.add('tab-active');
+                document.getElementById('section-theory').classList.add('hidden');
+                document.getElementById('section-triangle').classList.remove('hidden');
+                document.getElementById('section-tool').classList.add('hidden');
+            } else if (tab === 'tool') {
+                document.getElementById('tab-tool').classList.add('tab-active');
+                document.getElementById('section-theory').classList.add('hidden');
+                document.getElementById('section-triangle').classList.add('hidden');
+                document.getElementById('section-tool').classList.remove('hidden');
+            }
+        }
+
+        function setCalcMode(mode) {
+            currentMode = mode;
+            const btnVi = document.getElementById('btn-mode-vi');
+            const btnZr = document.getElementById('btn-mode-zr');
+            const boxVi = document.getElementById('inputs-vi');
+            const boxZr = document.getElementById('inputs-zr');
+
+            if (mode === 'vi') {
+                btnVi.className = "py-2 text-xs font-bold rounded-lg bg-blue-600 text-white shadow-sm transition";
+                btnZr.className = "py-2 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 transition";
+                boxVi.classList.remove('hidden');
+                boxZr.classList.add('hidden');
+            } else {
+                btnZr.className = "py-2 text-xs font-bold rounded-lg bg-blue-600 text-white shadow-sm transition";
+                btnVi.className = "py-2 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 transition";
+                boxZr.classList.remove('hidden');
+                boxVi.classList.add('hidden');
+            }
+            calculatePower();
+        }
+
+        function calculatePower() {
+            let P, Q, S, PF, thetaDeg, V, I;
+
+            if (currentMode === 'vi') {
+                V = parseFloat(document.getElementById('input-v').value);
+                I = parseFloat(document.getElementById('input-i').value);
+                thetaDeg = parseFloat(document.getElementById('input-theta').value);
+
+                document.getElementById('val-v').textContent = `${V} V`;
+                document.getElementById('val-i').textContent = `${I} A`;
+                document.getElementById('val-theta').textContent = `${thetaDeg.toFixed(2)} °`;
+
+                const thetaRad = thetaDeg * (Math.PI / 180);
+                S = V * I;
+                P = S * Math.cos(thetaRad);
+                Q = S * Math.sin(thetaRad);
+                PF = Math.cos(thetaRad);
+            } else {
+                V = parseFloat(document.getElementById('input-zr-v').value);
+                const R = parseFloat(document.getElementById('input-r').value);
+                const X = parseFloat(document.getElementById('input-x').value);
+
+                document.getElementById('val-zr-v').textContent = `${V} V`;
+                document.getElementById('val-r').textContent = `${R} Ω`;
+                document.getElementById('val-x').textContent = `${X} Ω`;
+
+                const Z = Math.sqrt(R*R + X*X);
+                I = V / Z;
+                S = V * I;
+                P = I*I * R;
+                Q = I*I * X;
+                PF = R / Z;
+                thetaDeg = Math.atan2(X, R) * (180 / Math.PI);
+            }
+
+            // 判斷功因領前或落後
+            let pfDesc = "";
+            if (Math.abs(thetaDeg) < 0.01) {
+                pfDesc = "同相 (純電阻)";
+            } else if (thetaDeg > 0) {
+                pfDesc = "滯後 (電感性)";
+            } else {
+                pfDesc = "超前 (電容性)";
+            }
+
+            // 功因改善模擬
+            const compCheckbox = document.getElementById('pf-compensate');
+            const compResultsDiv = document.getElementById('comp-results');
+            
+            if (compCheckbox.checked && thetaDeg > 0 && PF < 0.95) {
+                // 目標補償功因為 0.95 滯後
+                const targetPF = 0.95;
+                const targetTheta = Math.acos(targetPF); // 弧度
+                const targetQ = P * Math.tan(targetTheta);
+                const Qc = Q - targetQ; // 需補償的虛功 (var)
+                
+                // 估算並聯電容
+                const freq = 60; // 模擬 60Hz 系統
+                const capacitance = (Qc / (2 * Math.PI * freq * V * V)) * 1000000; // 轉換為 uF
+
+                compResultsDiv.innerHTML = `
+                    <p class="font-bold mb-1"><i class="fa-solid fa-bolt mr-1"></i>功因補償分析 (改善至 0.95)：</p>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>原虛功需求：<span class="font-mono">${Q.toFixed(1)} var</span></li>
+                        <li>目標功因需補償容量 $Q_C$：<span class="font-bold text-emerald-400 font-mono">${Qc.toFixed(1)} var</span></li>
+                        <li>估算所需並聯電容器容量 ($60\\text{Hz}$)：<span class="font-bold text-white font-mono">${capacitance.toFixed(2)} μF</span></li>
+                        <li>補償後全新視在功率 $S_{new}$ 將降至：<span class="font-mono">${(P / targetPF).toFixed(1)} VA</span></li>
+                    </ul>
+                `;
+                compResultsDiv.classList.remove('hidden');
+                
+                // 顯示補償後之數據
+                document.getElementById('out-s').textContent = (P / targetPF).toFixed(1);
+                document.getElementById('out-p').textContent = P.toFixed(1);
+                document.getElementById('out-q').textContent = targetQ.toFixed(1);
+                document.getElementById('out-pf').textContent = targetPF.toFixed(2);
+                document.getElementById('out-pf-desc').textContent = "改善至 0.95 (滯後)";
+
+                // 更新動態向量圖
+                updateSVG(P, targetQ, P/targetPF);
+            } else {
+                compResultsDiv.classList.add('hidden');
+                if (compCheckbox.checked && (thetaDeg <= 0 || PF >= 0.95)) {
+                    compResultsDiv.innerHTML = `<p class="text-xs text-amber-300"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 當前功率因數已經極佳，或屬於超前功因，無需電感補償。</p>`;
+                    compResultsDiv.classList.remove('hidden');
+                }
+                
+                // 正常數值顯示
+                document.getElementById('out-s').textContent = S.toFixed(1);
+                document.getElementById('out-p').textContent = P.toFixed(1);
+                document.getElementById('out-q').textContent = Q.toFixed(1);
+                document.getElementById('out-pf').textContent = PF.toFixed(2);
+                document.getElementById('out-pf-desc').textContent = pfDesc;
+
+                // 更新動態向量圖
+                updateSVG(P, Q, S);
+            }
+
+            // 動態更新 LaTeX 數學排版
+            if (typeof MathJax !== "undefined" && MathJax.typeset) {
+                MathJax.typeset();
+            }
+        }
+
+        function updateSVG(P, Q, S) {
+            // 動態 SVG 縮放演算法：中心基準點為 (60, 110)
+            const originX = 60;
+            const originY = 110;
+            
+            // 比例尺縮放，確保向量在 SVG 面板 (320x220) 內呈現最適大小
+            const maxVal = Math.max(Math.abs(P), Math.abs(Q), 10);
+            const scale = 180 / maxVal; 
+
+            const targetX = originX + (P * scale);
+            const targetY = originY - (Q * scale); // 因 SVG Y 軸向下，Q 為正時向上畫減去對應值
+
+            // 取得向量元素
+            const vecP = document.getElementById('svg-vec-p');
+            const vecQ = document.getElementById('svg-vec-q');
+            const vecS = document.getElementById('svg-vec-s');
+
+            // 繪製 P 實功向量 (水平)
+            vecP.setAttribute('x1', originX);
+            vecP.setAttribute('y1', originY);
+            vecP.setAttribute('x2', targetX);
+            vecP.setAttribute('y2', originY);
+
+            // 繪製 Q 虛功向量 (垂直)
+            vecQ.setAttribute('x1', targetX);
+            vecQ.setAttribute('y1', originY);
+            vecQ.setAttribute('x2', targetX);
+            vecQ.setAttribute('y2', targetY);
+
+            // 繪製 S 視在功向量 (斜邊)
+            vecS.setAttribute('x1', originX);
+            vecS.setAttribute('y1', originY);
+            vecS.setAttribute('x2', targetX);
+            vecS.setAttribute('y2', targetY);
+
+            // 更新文字與數值標籤位置
+            const lblP = document.getElementById('lbl-svg-p');
+            const lblQ = document.getElementById('lbl-svg-q');
+            const lblS = document.getElementById('lbl-svg-s');
+
+            lblP.textContent = `P = ${P.toFixed(0)} W`;
+            lblP.setAttribute('x', originX + (P*scale)/2 - 20);
+            lblP.setAttribute('y', originY + 20);
+
+            lblQ.textContent = `Q = ${Q.toFixed(0)} var`;
+            lblQ.setAttribute('x', targetX + 10);
+            lblQ.setAttribute('y', originY - (Q*scale)/2);
+
+            lblS.textContent = `S = ${S.toFixed(0)} VA`;
+            lblS.setAttribute('x', originX + (P*scale)/2 - 30);
+            lblS.setAttribute('y', originY - (Q*scale)/2 - 10);
+
+            // 直角標記動態適配
+            const ra = document.getElementById('svg-right-angle');
+            const size = 10;
+            const dir = Q >= 0 ? -1 : 1; 
+            ra.setAttribute('d', `M ${targetX - size} ${originY} L ${targetX - size} ${originY + (size*dir)} L ${targetX} ${originY + (size*dir)}`);
+        }
+
+        // Quiz 答題判定與解析邏輯
+        function checkAnswer(questionNum, chosen, buttonElement) {
+            const correctAnswer = 'B';
+            const buttons = document.querySelectorAll(`.quiz-btn-${questionNum}`);
+            
+            // 重置此題所有按鈕樣式
+            buttons.forEach(btn => {
+                btn.className = `quiz-btn-${questionNum} p-3 text-left border rounded-lg hover:bg-slate-100 transition text-sm flex justify-between items-center bg-white`;
+                const icon = btn.querySelector('i');
+                icon.className = 'fa-regular fa-circle text-slate-400';
+            });
+
+            // 展開此題說明
+            document.getElementById(`explain-${questionNum}`).classList.remove('hidden');
+
+            if (chosen === correctAnswer) {
+                buttonElement.className = `quiz-btn-${questionNum} p-3 text-left border border-emerald-500 rounded-lg transition text-sm flex justify-between items-center bg-emerald-50 text-emerald-800 font-bold`;
+                buttonElement.querySelector('i').className = 'fa-solid fa-circle-check text-emerald-500';
+            } else {
+                buttonElement.className = `quiz-btn-${questionNum} p-3 text-left border border-rose-500 rounded-lg transition text-sm flex justify-between items-center bg-rose-50 text-rose-800 font-medium`;
+                buttonElement.querySelector('i').className = 'fa-solid fa-circle-xmark text-rose-500';
+                
+                // 強調高亮正確答案
+                buttons.forEach(btn => {
+                    if (btn.outerHTML.includes(correctAnswer + ')')) {
+                        btn.className = `quiz-btn-${questionNum} p-3 text-left border border-emerald-500 rounded-lg transition text-sm flex justify-between items-center bg-emerald-50 text-emerald-800 font-bold`;
+                        btn.querySelector('i').className = 'fa-solid fa-circle-check text-emerald-500';
+                    }
+                });
+            }
+        }
+
+        // 頁面初始化
+        window.onload = function() {
+            calculatePower();
+        };
+    </script>
+</body>
+</html>
